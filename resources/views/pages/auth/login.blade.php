@@ -48,7 +48,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-3">
-                    <a href="#"
+                    <a href="{{ route('socialite.redirect', 'google') }}"
                         class="flex items-center justify-center gap-2 px-4 py-2 border dark:border-white/6 border-gray-200 rounded-lg text-sm dark:text-white/60  dark:hover:text-white dark:hover:border-white/20 transition-all">
                         <img src="{{ asset('icons/google.svg') }}" class="size-4" alt="">
                         {{ __('Continue with Google') }}
