@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Workspace;
+use App\Models\WorkspaceMembership;
+use App\WorkspaceRole;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,6 +52,7 @@ class SocialiteController extends Controller
 
         $user = DB::transaction(function () use ($provider, $socialiteUser) {
 
+            // Check for existing user by Provider ID
             $isNewUser = ! User::where('provider', $provider)
                 ->where('provider_id', $socialiteUser->getId())
                 ->exists();
@@ -56,9 +60,21 @@ class SocialiteController extends Controller
             $user = User::fromSocialite($socialiteUser, $provider);
 
             if ($isNewUser) {
-                // TODO: Create workspace and attach membership
+                $workspace = Workspace::create([
+                    'owner_id' => $user->id,
+                    'name' => "{$user->displayName}'s Workspace",
+                    'slug' => Workspace::generateSlugFromEmail($socialiteUser->getEmail() ?? (string) $user->id),
+                    'created_from_demo' => false,
+                ]);
 
-                $user->update(['current_workspace_id' => null]);
+                WorkspaceMembership::create([
+                    'workspace_id' => $workspace->id,
+                    'user_id' => $user->id,
+                    'role' => WorkspaceRole::Owner,
+                    'accepted_at' => now(), // owner is not invited.
+                ]);
+
+                $user->update(['current_workspace_id' => $workspace->id]);
             }
 
             return $user;
@@ -66,7 +82,12 @@ class SocialiteController extends Controller
 
         Auth::login($user, remember: true);
 
-        // TODO: Dispatch demo claim after the transaction commits.
+        // Dispatch demo claim after the transaction commits.
+        // Uses afterCommit() for the same reason as CreateNewUser —
+        // the job must not run before the user row is visible.
+        $demoSessionKey = request()->cookie('demo_session_key');
+
+        // TODO: Dispatch Claim demo audit job –– After adding audit model
 
         return redirect()->intended('/dashboard');
     }
