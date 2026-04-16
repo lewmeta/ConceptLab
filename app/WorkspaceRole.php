@@ -14,8 +14,8 @@ enum WorkspaceRole: string
         return match ($this) {
             WorkspaceRole::Owner => 'Owner',
             WorkspaceRole::Admin => 'Admin',
-            WorkspaceRole::Viewer => 'viewer',
-            WorkspaceRole::Member => 'member',
+            WorkspaceRole::Viewer => 'Viewer',
+            WorkspaceRole::Member => 'Member',
         };
     }
 
@@ -33,7 +33,7 @@ enum WorkspaceRole: string
     /**
      * Whether this role can manage workspace settings and members
      */
-    public function canMenage(): bool
+    public function canManage(): bool
     {
         return match ($this) {
             WorkspaceRole::Owner,

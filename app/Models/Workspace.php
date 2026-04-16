@@ -16,7 +16,7 @@ class Workspace extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected function cast(): array
+    protected function casts(): array
     {
         return [
             'created_from_demo' => 'boolean',

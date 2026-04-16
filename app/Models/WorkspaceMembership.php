@@ -24,7 +24,7 @@ class WorkspaceMembership extends Pivot
 
     /** Whether the user has accepted this membership invitation */
     public bool $hasAccepted {
-        get => $this->hasAccepted !== null;
+        get => $this->accepted_at !== null;
     }
 
     /** Whether this invitation is still awaiting acceptance */

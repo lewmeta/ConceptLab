@@ -85,9 +85,8 @@ class SocialiteController extends Controller
         // Dispatch demo claim after the transaction commits.
         // Uses afterCommit() for the same reason as CreateNewUser —
         // the job must not run before the user row is visible.
-        $demoSessionKey = request()->cookie('demo_session_key');
-
         // TODO: Dispatch Claim demo audit job –– After adding audit model
+        // $demoSessionKey = request()->cookie('demo_session_key');
 
         return redirect()->intended('/dashboard');
     }
