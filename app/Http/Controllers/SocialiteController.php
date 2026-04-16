@@ -25,16 +25,14 @@ class SocialiteController extends Controller
     }
 
     /**
-     * Handles the OAuth callback, finds or creates the user, provisions
-     * a workspace on first login, and dispatches ClaimDemoAudit if a
-     * demo session cookie is present.
+     * Handle the OAuth provider callback, authenticate or provision the user, and redirect to the intended location.
      *
-     * Mirrors the email registration claim path exactly — both paths
-     * go through the same job with the same afterCommit() guarantee.
+     * Finds or creates a local user for the given provider, logs the user in, provisions a workspace for first-time users,
+     * and redirects to the intended URL (falls back to `/dashboard`). If the OAuth state is invalid, redirects to `/login`
+     * with an error message.
      *
-     * isNewUser is determined before fromSocialite() runs to avoid
-     * a race condition where wasRecentlyCreated could be unreliable
-     * under concurrent requests for the same provider+provider_id.
+     * @param string $provider OAuth provider identifier (e.g., 'google', 'github', 'facebook').
+     * @return \Illuminate\Http\RedirectResponse A redirect response to the intended URL (falls back to '/dashboard').
      */
     public function callback(string $provider): RedirectResponse
     {
@@ -71,6 +69,11 @@ class SocialiteController extends Controller
         return redirect()->intended('/dashboard');
     }
 
+    /**
+     * Abort the request with HTTP 404 when the given OAuth provider is not in the allowed list.
+     *
+     * @param string $provider The OAuth provider name (must be one of self::SUPPORTED_PROVIDERS, e.g. 'google', 'github', 'facebook').
+     */
     private function abortIfUnsupported(string $provider): void
     {
         if (! in_array($provider, self::SUPPORTED_PROVIDERS, strict: true)) {
