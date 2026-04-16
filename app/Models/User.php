@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 #[Fillable(['name', 'email', 'password', 'role', 'avatar_url', 'provider', 'provider_id', 'current_workspace_id', 'onboarding_completed_at', 'current_team_id'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -70,4 +71,34 @@ class User extends Authenticatable
 
     // ─── Relationships ────────────────────────────────────────────────────
 
+
+    // ─── OAuth Factory ────────────────────────────────────────────────────
+
+    /**
+     * Find or create a User from a Socialite OAuth callback
+     * 
+     * Matches on provider + provider_id so the same social account
+     * cannot produce duplicate user rows. On first login, email is
+     * marked verified because the provider has already confirmed it.
+     *
+     * The caller (SocialiteController) is responsible for checking
+     * $user->wasRecentlyCreated and dispatching ProvisionNewUser
+     * and ClaimDemoAudit when true.
+     */
+    public static function fromSocialite(SocialiteUser $socialiteUser, string $provider): static
+    {
+        return static::firstOrCreate(
+            [
+                'provider' => $provider,
+                'provider_id' => $socialiteUser->getId(),
+            ],
+            [
+                'name' => $socialiteUser->getName(),
+                'email' => $socialiteUser->getEmail(),
+                'avatar_url' => $socialiteUser->getAvatar(),
+                'email_verified_at' => now(),
+                'role' => UserRole::User,
+            ],
+        );
+    }
 }
