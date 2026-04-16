@@ -75,15 +75,15 @@ class User extends Authenticatable
     // ─── OAuth Factory ────────────────────────────────────────────────────
 
     /**
-     * Find or create a User from a Socialite OAuth callback
-     * 
-     * Matches on provider + provider_id so the same social account
-     * cannot produce duplicate user rows. On first login, email is
-     * marked verified because the provider has already confirmed it.
+     * Finds or creates a User corresponding to a Socialite OAuth account.
      *
-     * The caller (SocialiteController) is responsible for checking
-     * $user->wasRecentlyCreated and dispatching ProvisionNewUser
-     * and ClaimDemoAudit when true.
+     * Matches records by `provider` and `provider_id`. If a new user is created,
+     * sets `name`, `email`, `avatar_url`, `email_verified_at` to the current time,
+     * and `role` to `UserRole::User`.
+     *
+     * @param \Laravel\Socialite\Contracts\User $socialiteUser The Socialite user payload from the OAuth provider.
+     * @param string $provider The provider identifier (e.g., "github", "google").
+     * @return static The existing or newly created User instance.
      */
     public static function fromSocialite(SocialiteUser $socialiteUser, string $provider): static
     {
