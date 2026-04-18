@@ -71,7 +71,19 @@ class Workspace extends Model
      */
     public static function generateSlugFromEmail(string $email): string
     {
-        $base = Str::slug(explode('@', $email)[0]);
+
+        // $base = Str::of($email)
+        //     ->before('@')
+        //     ->replace('.', ' ')
+        //     ->slug()
+        //     ->toString(); --- IGNORE ---
+
+        $base = Str::of($email)
+            ->before('@')
+            ->replace(['.', '_', '+', '/', '\\'], ' ')
+            ->slug()
+            ->toString(); // Result: "lewis-nakitare"
+
         $slug = $base;
         $suffix = 2;
 

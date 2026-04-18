@@ -38,7 +38,7 @@ enum WorkspaceRole: string
         return match ($this) {
             WorkspaceRole::Owner,
             WorkspaceRole::Admin => true,
-            WorkspaceRole::Member => true,
+            WorkspaceRole::Member,
             WorkspaceRole::Viewer => false
         };
     }
