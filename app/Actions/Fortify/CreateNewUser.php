@@ -2,12 +2,13 @@
 
 namespace App\Actions\Fortify;
 
+use App\Actions\ProvisionWorkspace;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
+use App\Enums\WorkspaceRole;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceMembership;
-use App\WorkspaceRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +21,8 @@ class CreateNewUser implements CreatesNewUsers
     use PasswordValidationRules, ProfileValidationRules;
 
     public function __construct(
-        private readonly Request $request
+        private readonly Request $request,
+        private readonly ProvisionWorkspace $provision,
     ) {}
 
     /**
@@ -32,7 +34,7 @@ class CreateNewUser implements CreatesNewUsers
      * rolled back and the registration is retried cleanly.
      *
      * ClaimDemoAudit dispatches afterCommit() so the job cannot run
-     * before the user and workspace rows are visible to the queue worker.
+     * ProvisionWorkspace — the single source of truth for that logic.
      */
     public function create(array $input): User
     {
@@ -46,26 +48,7 @@ class CreateNewUser implements CreatesNewUsers
                 'password' => Hash::make($input['password']),
             ]);
 
-            $workspace = Workspace::create([
-                'owner_id' => $user->id,
-                'name' => "{$user->displayName}'s Workspace",
-                'slug' => Workspace::generateSlugFromEmail($input['email']),
-                'created_from_demo' => false,
-            ]);
-
-            WorkspaceMembership::create([
-                'workspace_id' => $workspace->id,
-                'user_id' => $user->id,
-                'role' => WorkspaceRole::Owner,
-                'accepted_at' => now(),
-            ]);
-
-            $user->update(['current_workspace_id' => $workspace->id]);
-
-            // TODO: Dispatch demo claim after commit - the job reads the session
-            // from the cookie set by the LogicInput Livewire component.
-
-            //TODO: Add Claim audit job dispatch.
+            $this->provision->execute($user, $this->request);
 
             return $user;
         });
@@ -82,23 +65,4 @@ class CreateNewUser implements CreatesNewUsers
             'password' => ['required', 'confirmed', Password::defaults()]
         ])->validate();
     }
-
-    /**
-     * Validate and create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     */
-    // public function create(array $input): User
-    // {
-    //     Validator::make($input, [
-    //         ...$this->profileRules(),
-    //         'password' => $this->passwordRules(),
-    //     ])->validate();
-
-    //     return User::create([
-    //         'name' => $input['name'],
-    //         'email' => $input['email'],
-    //         'password' => $input['password'],
-    //     ]);
-    // }
 }
