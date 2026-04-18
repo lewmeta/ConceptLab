@@ -65,9 +65,12 @@ class Workspace extends Model
     // ─── Slug Generation ─────────────────────────────────────────────────
 
     /**
-     * Generate a unique workspace slug from an email prefix.
-     * Appends an incrementing numeric siffix on collission: username-2, username-3, etc.
-     * Checks soft-deleted workspaces to prevent reuse of deleted slugs
+     * Create a unique workspace slug derived from an email's local-part.
+     *
+     * Builds the base from the substring before `@`, replaces `.`, `_`, `+`, `/`, and `\` with spaces, slugifies that base, and if it collides with an existing (including soft-deleted) workspace slug appends `-2`, `-3`, ... until a unique slug is found.
+     *
+     * @param string $email The email address to derive the slug from (uses the part before `@`).
+     * @return string The generated unique slug.
      */
     public static function generateSlugFromEmail(string $email): string
     {
