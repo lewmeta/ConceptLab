@@ -31,7 +31,9 @@ enum WorkspaceRole: string
     }
 
     /**
-     * Whether this role can manage workspace settings and members
+     * Determines whether the role can manage workspace settings and members.
+     *
+     * @return bool `true` if the role can manage workspace settings and members, `false` otherwise.
      */
     public function canManage(): bool
     {

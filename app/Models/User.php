@@ -74,13 +74,21 @@ class User extends Authenticatable
 
     // ─── Relationships ────────────────────────────────────────────────────
 
-    /** The workspace the users is currently active in - the tenancy achor */
+    /**
+     * Get the workspace the user is currently active in.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo BelongsTo relation to the Workspace model.
+     */
     public function currentWorkspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class, 'current_workspace_id');
     }
 
-    /** All workspace membership records across every workspace this user belongs to. */
+    /**
+     * Get all workspace membership records for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany The user's WorkspaceMembership records across all workspaces.
+     */
     public function workspaceMemberships(): HasMany
     {
         return $this->hasMany(WorkspaceMembership::class);
@@ -90,28 +98,15 @@ class User extends Authenticatable
     // ─── OAuth Factory ────────────────────────────────────────────────────
 
     /**
-     * Find or create a User from a Socialite OAuth callback.
+     * Find or create a User from a Socialite OAuth callback and link OAuth credentials when appropriate.
      *
-     * Handles three distinct scenarios:
+     * Performs one of three outcomes: returns an existing user matching provider+provider_id; links the OAuth
+     * credentials to an existing user found by email (if present) and returns that user; or creates and returns
+     * a new user populated from the SocialiteUser.
      *
-     * Scenario A — Returning OAuth user:
-     *   provider + provider_id match → return existing user as-is.
-     *
-     * Scenario B — Email collision (critical):
-     *   A user previously registered with email/password using the same
-     *   email address. Their row has provider = null, provider_id = null.
-     *   We link the OAuth credentials to their existing account rather
-     *   than attempting to create a duplicate row (which would throw a
-     *   unique constraint violation on the email column).
-     *   The user gets OAuth login linked to their existing account.
-     *
-     * Scenario C — Brand new user:
-     *   No matching row by provider+id or email → create a fresh user.
-     *
-     * The caller (SocialiteController) checks $user->wasRecentlyCreated
-     * to determine whether ProvisionWorkspace should run. For Scenario B,
-     * wasRecentlyCreated is false — the user already has a workspace and
-     * ProvisionWorkspace's idempotency guard handles it regardless.
+     * @param SocialiteUser $socialiteUser The Socialite user payload from the OAuth provider.
+     * @param string $provider The OAuth provider identifier (e.g., "github", "google").
+     * @return static The matching or newly created User model instance.
      */
     public static function fromSocialite(SocialiteUser $socialiteUser, string $provider): static
     {
