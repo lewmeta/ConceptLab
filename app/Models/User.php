@@ -9,6 +9,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +74,18 @@ class User extends Authenticatable
 
     // ─── Relationships ────────────────────────────────────────────────────
 
+    /** The workspace the users is currently active in - the tenancy achor */
+    public function currentWorkspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class, 'current_workspace_id');
+    }
+
+    /** All workspace membership records across every workspace this user belongs to. */
+    public function workspaceMemberships(): HasMany
+    {
+        return $this->hasMany(WorkspaceMembership::class);
+    }
+
 
     // ─── OAuth Factory ────────────────────────────────────────────────────
 
@@ -123,7 +137,7 @@ class User extends Authenticatable
                     $byEmail->update([
                         'provider' => $provider,
                         'provider_id' => $socialiteUser->getId(),
-                        'avatar_url' => $socialiteUser->getAvatar(),
+                        'avatar_url' => $socialiteUser->getAvatar() ?? $byEmail->avatar_url,
                         'email_verified_at' => $byEmail->email_verified_at ?? now(),
                     ]);
 
@@ -132,9 +146,15 @@ class User extends Authenticatable
             }
 
             // Scenario C - brand new user
-            return static::create(
+            // Uses ForceCreate to bypass mass assignment protection (email_verified_at).
+            return static::forceCreate(
                 [
-                    'name' => $socialiteUser->getName(),
+                    // 'name' => $socialiteUser->getName(),
+                    'name' => $socialiteUser->getName()
+                        ?? $socialiteUser->getNickname()
+                        ?? explode('@', $socialiteUser->getEmail() ?? '')[0]
+                        ?? 'User',
+
                     'email' => $socialiteUser->getEmail(),
                     'avatar_url' => $socialiteUser->getAvatar(),
                     'provider' => $provider,

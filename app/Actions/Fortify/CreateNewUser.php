@@ -5,14 +5,10 @@ namespace App\Actions\Fortify;
 use App\Actions\ProvisionWorkspace;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
-use App\Enums\WorkspaceRole;
 use App\Models\User;
-use App\Models\Workspace;
-use App\Models\WorkspaceMembership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
