@@ -4,13 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\UserRole;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
@@ -75,30 +76,73 @@ class User extends Authenticatable
     // ─── OAuth Factory ────────────────────────────────────────────────────
 
     /**
-     * Find or create a User from a Socialite OAuth callback
-     * 
-     * Matches on provider + provider_id so the same social account
-     * cannot produce duplicate user rows. On first login, email is
-     * marked verified because the provider has already confirmed it.
+     * Find or create a User from a Socialite OAuth callback.
      *
-     * The caller (SocialiteController) is responsible for checking
-     * $user->wasRecentlyCreated and dispatching ProvisionNewUser
-     * and ClaimDemoAudit when true.
+     * Handles three distinct scenarios:
+     *
+     * Scenario A — Returning OAuth user:
+     *   provider + provider_id match → return existing user as-is.
+     *
+     * Scenario B — Email collision (critical):
+     *   A user previously registered with email/password using the same
+     *   email address. Their row has provider = null, provider_id = null.
+     *   We link the OAuth credentials to their existing account rather
+     *   than attempting to create a duplicate row (which would throw a
+     *   unique constraint violation on the email column).
+     *   The user gets OAuth login linked to their existing account.
+     *
+     * Scenario C — Brand new user:
+     *   No matching row by provider+id or email → create a fresh user.
+     *
+     * The caller (SocialiteController) checks $user->wasRecentlyCreated
+     * to determine whether ProvisionWorkspace should run. For Scenario B,
+     * wasRecentlyCreated is false — the user already has a workspace and
+     * ProvisionWorkspace's idempotency guard handles it regardless.
      */
     public static function fromSocialite(SocialiteUser $socialiteUser, string $provider): static
     {
-        return static::firstOrCreate(
-            [
-                'provider' => $provider,
-                'provider_id' => $socialiteUser->getId(),
-            ],
-            [
-                'name' => $socialiteUser->getName(),
-                'email' => $socialiteUser->getEmail(),
-                'avatar_url' => $socialiteUser->getAvatar(),
-                'email_verified_at' => now(),
-                'role' => UserRole::User,
-            ],
-        );
+
+        // Wrapped in a transaction to ensure atomicity of the find-or-create logic.
+        return DB::transaction(function () use ($socialiteUser, $provider) {
+            // Scenario A - returning OAuth user
+            $existing = static::where('provider', $provider)
+                ->where('provider_id', $socialiteUser->getId())
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            // Scenario B - email collision: link Oauth to existing account
+            if ($socialiteUser->getEmail()) {
+                $byEmail = static::where('email', $socialiteUser
+                    ->getEmail())
+                    ->first();
+
+                if ($byEmail) {
+                    $byEmail->update([
+                        'provider' => $provider,
+                        'provider_id' => $socialiteUser->getId(),
+                        'avatar_url' => $socialiteUser->getAvatar(),
+                        'email_verified_at' => $byEmail->email_verified_at ?? now(),
+                    ]);
+
+                    return $byEmail;
+                }
+            }
+
+            // Scenario C - brand new user
+            return static::create(
+                [
+                    'name' => $socialiteUser->getName(),
+                    'email' => $socialiteUser->getEmail(),
+                    'avatar_url' => $socialiteUser->getAvatar(),
+                    'provider' => $provider,
+                    'provider_id' => $socialiteUser->getId(),
+                    'email_verified_at' => now(),
+                    'role' => UserRole::User,
+                ],
+            );
+        });
     }
 }
