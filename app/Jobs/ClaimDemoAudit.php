@@ -40,7 +40,7 @@ class ClaimDemoAudit implements ShouldQueue
         $user = User::find($this->userId);
 
         if (!$user) {
-            // User my have deleted their account between registration and the job running
+            // User may have deleted their account between registration and the job running
             Log::info('ClaimDemoAudit: User not found — may have been deleted.', [
                 'user_id' => $this->userId,
             ]);
@@ -88,7 +88,7 @@ class ClaimDemoAudit implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error('ClaimDemoAudit: All retires exhausted – demo audit not claimed.', [
+        Log::error('ClaimDemoAudit: All retries exhausted – demo audit not claimed.', [
             'user_id' => $this->userId,
             'demo_session_key' => $this->demoSessionKey,
             'error' => $exception->getMessage(),

@@ -39,6 +39,11 @@ class ProvisionWorkspace
             return;
         }
 
+
+        // Dispatch demo claim after the transaction commits.
+        // The job handles the case where no unclaimed demo exists gracefully.
+        $demoSessionKey = $request?->cookie('demo_session_key');
+
         DB::transaction(function () use ($user, $request) {
             $workspace = Workspace::create([
                 'owner_id' => $user->id,
@@ -57,16 +62,13 @@ class ProvisionWorkspace
             ]);
 
             $user->update(['current_workspace_id' => $workspace->id]);
-
-            // Dispatch demo claim after the transaction commits.
-            // The job handles the case where no unclaimed demo exists gracefully.
-            $demoSessionKey = $request?->cookie('demo_session_key');
-
-            Log::debug("ProvisionWorkspace: Dispatching demo claim job.", ['demo_session_key' => $demoSessionKey]);
-
-            if (filled($demoSessionKey)) {
-                ClaimDemoAudit::dispatch($user->id, $demoSessionKey)->afterCommit();
-            }
         });
+
+        // Dispatch demo claim after the transaction commits.
+        Log::debug("ProvisionWorkspace: Dispatching demo claim job.", ['demo_session_key' => $demoSessionKey]);
+
+        if (filled($demoSessionKey)) {
+            ClaimDemoAudit::dispatch($user->id, $demoSessionKey);
+        }
     }
 }

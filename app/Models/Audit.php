@@ -66,12 +66,12 @@ class Audit extends Model
             $audit->input_word_count = str_word_count(strip_tags($audit->input_text));
         });
 
-        // unput_text is frozen at INSERT - editing creates a new version row.
+        // input_text is frozen at INSERT - editing creates a new version row.
         static::updating(function (Audit $audit) {
             if ($audit->isDirty('input_text')) {
                 throw new \LogicException(
                     "Audit #{$audit->id} input_text is immutable." .
-                        "Create a new version via Audit::newVersion() instead"
+                        "Create a new version via Audit::newVersion() instead."
                 );
             }
         });
