@@ -20,6 +20,8 @@ return [
 
     'driver' => env('SESSION_DRIVER', 'database'),
 
+    'domain' => env('SESSION_DOMAIN', '.conceptlab.test'),
+
     /*
     |--------------------------------------------------------------------------
     | Session Lifetime

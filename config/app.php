@@ -13,7 +13,8 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'ConceptLab'),
+    'domain' => env('APP_DOMAIN', 'conceptlab.com'), // Admin subdomain configured via APP_DOMAIN (e.g. conceptlab.com, admin.conceptlab.com)
 
     /*
     |--------------------------------------------------------------------------
