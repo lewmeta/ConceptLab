@@ -23,4 +23,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });
 
+// ── Authenticated — Workspace required ───────────────────────────────────────
+
+Route::middleware(['auth', 'workspace.member'])->group(function () {
+
+    Route::get('/dashboard', fn() => view('dashboard'))
+        ->name('dashboard');
+
+    // Stub route — replaced with a full Livewire controller in Module 3.
+    // Registered now so FortifyServiceProvider post-auth redirects resolve.
+    Route::get('/audits/{audit}', function () {
+        return view('dashboard');
+    })->name('audits.show');
+});
+
 require __DIR__ . '/settings.php';
