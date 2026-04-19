@@ -37,7 +37,7 @@ class Heuristic extends Model
 
     /** A heuristic is live when it is both active and published */
     public bool $isLive {
-        get => $this->is_active && $this->is_published_at !== null;
+        get => $this->is_active && $this->published_at !== null;
     }
 
     /** Whether this rule has at least one successor (i.e it was corrected) */
