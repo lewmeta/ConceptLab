@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Workspace;
 use App\Models\WorkspaceMembership;
 use App\Enums\WorkspaceRole;
+use App\Jobs\ClaimDemoAudit;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Single source of truth for workspace provisioning after user creation.
@@ -30,12 +32,17 @@ use App\Enums\WorkspaceRole;
  */
 class ProvisionWorkspace
 {
-    public function execute(User $user, Request $request): void
+    public function execute(User $user, ?Request $request = null): void
     {
         // Guard - if the user was already provisioned, do not create a second workspace.
         if ($user->current_workspace_id !== null) {
             return;
         }
+
+
+        // Dispatch demo claim after the transaction commits.
+        // The job handles the case where no unclaimed demo exists gracefully.
+        $demoSessionKey = $request?->cookie('demo_session_key');
 
         DB::transaction(function () use ($user, $request) {
             $workspace = Workspace::create([
@@ -55,15 +62,13 @@ class ProvisionWorkspace
             ]);
 
             $user->update(['current_workspace_id' => $workspace->id]);
-
-            // Dispatch demo claim after the transaction commits.
-            // The job handles the case where no unclaimed demo exists gracefully.
-            // $demoSessionKey = $request->cookies('demo_session_key');
-
-            // TODO: Send demo audit event if sessionKey exists
-            // if (filled($demoSessionKey)) {
-            //     ClaimDemoAudit::dispatch($user->id, $demoSessionKey)->afterCommit();
-            // }
         });
+
+
+        if (filled($demoSessionKey)) {
+            // Dispatch demo claim after the transaction commits.
+            Log::debug("ProvisionWorkspace: Dispatching demo claim job.", ['demo_session_key' => $demoSessionKey]);
+            ClaimDemoAudit::dispatch($user->id, $demoSessionKey);
+        }
     }
 }
