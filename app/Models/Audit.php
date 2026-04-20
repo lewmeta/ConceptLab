@@ -185,13 +185,13 @@ class Audit extends Model
         return $this->belongsTo(Workspace::class);
     }
 
-     /** The user who created this audit. */
-     public function user(): BelongsTo
-     {
-         return $this->belongsTo(User::class);
-     }
+    /** The user who created this audit. */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
-  /**
+    /**
      * The previous version of this audit in the version chain.
      * NULL for root versions (isRootVersion = true)
      */
@@ -206,5 +206,11 @@ class Audit extends Model
         return $this->hasMany(Audit::class, 'parent_audit_id');
     }
 
-    // TODO: add further relations to (Findinds, ForumThread, MCPLogs)
+    /** All findings produced by the rule engine for this audit. */
+    public function findings(): HasMany
+    {
+        return $this->hasMany(Finding::class);
+    }
+
+    // TODO: add further relations to (Findings, ForumThread, MCPLogs)
 }
