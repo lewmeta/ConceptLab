@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['workspace_id', 'user_id', 'parent_audit_id', 'version', 'title', 'input_text', 'input_char_count', 'input_word_count', 'status', 'sharpness_score', 'is_demo', 'demo_session_key', 'demo_session_expires', 'claimed_at', 'ai_safety_net_completed', 'analyzing_started_at', 'diagnosed_at', 'sharpened_at',])]
@@ -212,5 +213,16 @@ class Audit extends Model
         return $this->hasMany(Finding::class);
     }
 
-    // TODO: add further relations to (Findings, ForumThread, MCPLogs)
+    /** The single Forum Lite thread associated with this audit (V1: one per audit). */
+    public function forumThread(): HasOne
+    {
+        return $this->hasOne(ForumThread::class);
+    }
+
+    /** All MCP tool call log entries for this audit's lifecycle. */
+    public function mcpLogs(): HasMany
+    {
+        return $this->hasMany(AuditMcpLog::class);
+    }
+
 }
