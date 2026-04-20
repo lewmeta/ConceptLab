@@ -212,5 +212,5 @@ class Audit extends Model
         return $this->hasMany(Finding::class);
     }
 
-    // TODO: add further relations to (Findinds, ForumThread, MCPLogs)
+    // TODO: add further relations to (Findings, ForumThread, MCPLogs)
 }

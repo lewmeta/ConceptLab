@@ -57,7 +57,7 @@ class Finding extends Model
      * All offsets reference the frozen audit.input_text — they must be
      * within its bounds and form a valid non-empty span.
      */
-    public static function booted(): void
+    protected static function booted(): void
     {
         static::creating(function (Finding $finding) {
             $audit = Audit::withoutGlobalScopes()->find($finding->audit_id);
