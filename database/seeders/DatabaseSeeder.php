@@ -16,16 +16,9 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@conceptlab.com',
-            'password' => bcrypt('password'),
-            'email_verified_at' => now(),
-            'role' => UserRole::Admin,
-        ]);
-
         $this->call([
             HeuristicSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }
