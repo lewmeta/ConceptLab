@@ -39,7 +39,7 @@ class ForumMessage extends Model
         get => $this->role === ForumMessageRole::User;
     }
 
-        // ─── Relationships ────────────────────────────────────────────────────
+    // ─── Relationships ────────────────────────────────────────────────────
 
     /** The Forum thread this message belongs to. */
     public function thread(): BelongsTo
