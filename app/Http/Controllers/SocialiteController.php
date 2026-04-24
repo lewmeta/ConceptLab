@@ -20,12 +20,30 @@ class SocialiteController extends Controller
     /**
      * Redirects the user to the OAuth provider's authorization page.
      */
+    // public function redirect(string $provider): RedirectResponse
+    // {
+    //     $this->abortIfUnsupported($provider);
+
+    //     return Socialite::driver($provider)->redirect();
+    // }
     public function redirect(string $provider): RedirectResponse
     {
         $this->abortIfUnsupported($provider);
 
-        return Socialite::driver($provider)->redirect();
+        /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+        $driver = Socialite::driver($provider);
+
+        // Add provider-specific "force select" parameters
+        $driver = match ($provider) {
+            'google'   => $driver->with(['prompt' => 'select_account']),
+            'facebook' => $driver->with(['auth_type' => 'reauthenticate']),
+            'github'   => $driver->with(['allow_signup' => 'false']), // Prevents auto-signup, but limited effect
+            default    => $driver,
+        };
+
+        return $driver->redirect();
     }
+
 
     /**
      * Handles the OAuth callback.
