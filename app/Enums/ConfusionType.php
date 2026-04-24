@@ -34,7 +34,7 @@ enum ConfusionType: string
      * 
      * @return string
      */
-    public function color(): string
+    public function colour(): string
     {
         return match ($this) {
             ConfusionType::WordConcept              => '#534AB7', // Purple
