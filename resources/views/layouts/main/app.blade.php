@@ -10,7 +10,7 @@
     <div class="">
         <header class="demo-header" role="banner">
             <div class="demo-header-inner">
-                <a href="{{ url('/') }}" class="brand" aria-label="Significst home">
+                <a href="{{ url('/') }}" class="brand" aria-label="Concept.LAB home">
                     <span class="brand-hex" aria-hidden="true">C</span>
                     <span class="brand-name">Concept.LAB</span>
                 </a>

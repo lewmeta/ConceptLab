@@ -1,4 +1,4 @@
-<x-layouts::main.app :title="'Forensic Logic Auditor' ?? null">
+<x-layouts::main.app title="Forensic Logic Auditor">
 
 </x-layouts::main.app>
 
