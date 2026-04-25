@@ -64,8 +64,6 @@
     --hl-purple-b: rgba(83,  74,  183, 0.55);
     --hl-pink-b:   rgba(153, 53,  86,  0.55);
 
-    /* Typography */
-    --font-sans: 'DM Sans', 'Inter', system-ui, sans-serif;
 
     /* Radii */
     --r-sm: 4px;

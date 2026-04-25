@@ -44,12 +44,11 @@
                     <img src="{{ asset('icons/google.svg') }}" class="size-4" alt="">
                     {{ __('Continue with Google') }}
                 </a>
-                 <a href="{{ route('socialite.redirect', 'facebook') }}"
-                        class="flex items-center justify-center gap-2 px-4 py-2 border dark:border-white/6 border-gray-200 rounded-lg text-sm dark:text-white/60  dark:hover:text-white dark:hover:border-white/20 transition-all">
-                        <img src="{{ asset('icons/facebook.svg') }}" class="size-5" alt="">
-                        {{ __('Continue with Facebook') }}
-                    </a>
-                </div>
+                <a href="{{ route('socialite.redirect', 'facebook') }}"
+                    class="flex items-center justify-center gap-2 px-4 py-2 border border-white/6 rounded-lg text-sm text-white/60 hover:text-white hover:border-white/20 transition-all">
+                    <img src="{{ asset('icons/facebook.svg') }}" class="size-4" alt="">
+                    {{ __('Continue with Facebook') }}
+                </a>
             </div>
         </form>
 
