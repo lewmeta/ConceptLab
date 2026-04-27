@@ -3,7 +3,7 @@
 use App\Http\Controllers\SocialiteController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::view('/', 'home.index')->name('home');
 
 // ── OAuth — Socialite ─────────────────────────────────────────────────────────
 

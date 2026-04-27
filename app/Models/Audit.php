@@ -83,7 +83,10 @@ class Audit extends Model
                 return;
             }
 
-            $from = AuditStatus::from($audit->getOriginal('status'));
+            // $from = AuditStatus::from($audit->getOriginal('status'));
+            // $from = $audit->getOriginal('status');
+            $from = AuditStatus::from($audit->getRawOriginal('status'));
+
             $to = $audit->status;
 
             if (! $from->canTransitionTo($to)) {
@@ -224,5 +227,4 @@ class Audit extends Model
     {
         return $this->hasMany(AuditMcpLog::class);
     }
-
 }

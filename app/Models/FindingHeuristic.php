@@ -16,6 +16,7 @@ class FindingHeuristic extends Pivot
      */
     public const UPDATED_AT = null;
 
+    protected $table = 'finding_heuristics';
     protected function casts(): array
     {
         return [
