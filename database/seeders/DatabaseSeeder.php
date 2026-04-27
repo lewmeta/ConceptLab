@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             HeuristicSeeder::class,
-            AdminSeeder::class,
+            // AdminSeeder::class,
         ]);
     }
 }
