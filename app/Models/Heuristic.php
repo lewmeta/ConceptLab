@@ -77,12 +77,15 @@ class Heuristic extends Model
 
     // ─── Query Scopes ─────────────────────────────────────────────────────
 
-    /** Only rules visible to the audit engine: active and published */
+    /** 
+     * Only rules visible to the audit engine: active and published 
+     * 
+     * */
     #[Scope]
     protected function live(Builder $query): void
     {
         $query->where('is_active', true)
-        ->whereNotNull('published_at');
+            ->whereNotNull('published_at');
     }
 
     /** Only rules not yet published (safe to edit) */
