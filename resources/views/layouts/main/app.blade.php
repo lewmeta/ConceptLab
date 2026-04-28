@@ -14,9 +14,10 @@
             <!-- Brand -->
             <a href="{{ url('/') }}" class="flex items-center gap-2.5 no-underline">
                 <div
-                    class="brand-hex flex h-6 w-6 items-center justify-center bg-accent text-[11px] font-medium text-white">
+                    class="flex h-6.5 w-6.5 items-center justify-center bg-[#6c62c7] text-[11px] font-medium text-white">
                     S
                 </div>
+    
                 <span class="text-sm font-medium tracking-tight text-white">
                     Conceptlab
                 </span>
