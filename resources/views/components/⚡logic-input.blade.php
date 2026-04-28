@@ -188,7 +188,7 @@ new class extends Component
     private function resolveQuestion(\App\Models\Finding $finding): string
     {
         $heuristic = $finding->findingHeuristics
-            ->sortByDesc(fn ($fh) => $fh->heuristic->severity_weight)
+            ->sortByDesc(fn ($fh) => $fh->heuristic?->severity_weight ?? 0)
             ->first()
             ?->heuristic;
 

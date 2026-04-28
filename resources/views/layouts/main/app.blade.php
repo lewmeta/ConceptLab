@@ -14,7 +14,7 @@
             <!-- Brand -->
             <a href="{{ url('/') }}" class="flex items-center gap-2.5 no-underline">
                 <div
-                    class="flex h-6.5 w-6.5 items-center justify-center bg-[#6c62c7] text-[11px] font-medium text-white">
+                    class="brand-hex flex h-6.5 w-6.5 items-center justify-center bg-[#6c62c7] text-[11px] font-medium text-white">
                     S
                 </div>
     
