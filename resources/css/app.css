@@ -10,13 +10,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ── Design tokens ───────────────────────────────────────────────────────── */
-/*
- * @theme registers tokens that generate Tailwind utility classes.
- * bg-base, text-primary, border-subtle, etc. become real utilities.
- *
- * Locked palette from the UI spec — do not change these values without
- * updating the radar chart and sidebar colour references in Module 3.
- */
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -36,43 +29,35 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+
+    /* Backgrounds */
+    --color-base: #0C0C0A;
+    --color-surface: #111110;
+    --color-card: #1A1A17;
+
+    /* Accent */
+    /* --color-accent: #6C62C7; */
+    --color-accent-hover: #7B72D6;
+
+    /* Confusion type colours — locked per UI spec */
+    --color-word-concept: #534AB7;
+    --color-concept-referent: #0F6E56;
+    --color-concept-theory: #BA7517;
+    --color-concept-operationalization: #185FA5;
+    --color-prototype-essence: #993C1D;
+    --color-feature-indicator: #993556;
 }
 
 :root {
-    /* Backgrounds */
-    --bg-base: #0C0C0A;
-    --bg-surface: #111110;
-    --bg-card: #1A1A17;
-    --bg-border: rgba(255, 255, 255, 0.06);
 
-    /* Typography */
-    --text-primary: rgba(255, 255, 255, 0.92);
-    --text-secondary: rgba(255, 255, 255, 0.50);
-    --text-muted: rgba(255, 255, 255, 0.28);
-
-    /* Accent */
-    --accent: #6C62C7;
-    --accent-hover: #7B72D6;
-
-    /* Confusion type colours (locked per spec) */
-    --colour-word-concept: #534AB7;
-    --colour-concept-referent: #0F6E56;
-    --colour-concept-theory: #BA7517;
-    --colour-concept-operationalization: #185FA5;
-    --colour-prototype-essence: #993C1D;
-    --colour-feature-indicator: #993556;
-
-    /* Highlight span backgrounds */
-    --hl-red: rgba(220, 60, 60, 0.20);
-    --hl-amber: rgba(186, 117, 23, 0.20);
-    --hl-purple: rgba(83, 74, 183, 0.20);
-    --hl-pink: rgba(153, 53, 86, 0.20);
-
-    /* Highlight span border-bottom colours */
-    --hl-red-b: rgba(220, 60, 60, 0.55);
-    --hl-amber-b: rgba(186, 117, 23, 0.55);
-    --hl-purple-b: rgba(83, 74, 183, 0.55);
-    --hl-pink-b: rgba(153, 53, 86, 0.55);
+    --hl-red-bg: rgba(220, 60, 60, 0.20);
+    --hl-red-border: rgba(220, 60, 60, 0.55);
+    --hl-amber-bg: rgba(186, 117, 23, 0.20);
+    --hl-amber-border: rgba(186, 117, 23, 0.55);
+    --hl-purple-bg: rgba(83, 74, 183, 0.20);
+    --hl-purple-border: rgba(83, 74, 183, 0.55);
+    --hl-pink-bg: rgba(153, 53, 86, 0.20);
+    --hl-pink-border: rgba(153, 53, 86, 0.55);
 
 
     /* Radii */
@@ -100,6 +85,50 @@
     }
 }
 
+/* ── Non-composable component abstractions ───────────────────────────────── */
+
+@layer components {
+
+    /* Brand hexagon — clip-path cannot be expressed as a utility */
+    .brand-hex {
+        clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    }
+
+    /* Finding highlight marks — background + border-bottom pair per type */
+    .finding-mark {
+        border-radius: 3px;
+        padding: 1px 2px;
+        border-bottom-width: 2px;
+        border-bottom-style: solid;
+        cursor: pointer;
+        transition: filter 150ms;
+    }
+
+    .finding-mark:hover {
+        filter: brightness(1.3);
+    }
+
+    .highlight-red {
+        background: var(--hl-red-bg);
+        border-bottom-color: var(--hl-red-border);
+    }
+
+    .highlight-amber {
+        background: var(--hl-amber-bg);
+        border-bottom-color: var(--hl-amber-border);
+    }
+
+    .highlight-purple {
+        background: var(--hl-purple-bg);
+        border-bottom-color: var(--hl-purple-border);
+    }
+
+    .highlight-pink {
+        background: var(--hl-pink-bg);
+        border-bottom-color: var(--hl-pink-border);
+    }
+}
+
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
 }
@@ -112,17 +141,4 @@ input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
-}
-
-.brand-hex {
-    width: 26px;
-    height: 26px;
-    background: var(--accent);
-    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 500;
-    color: #fff;
 }

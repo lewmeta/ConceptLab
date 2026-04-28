@@ -22,7 +22,7 @@ new class extends Component
 
     // ── State ─────────────────────────────────────────────────────────────
 
-    #[Validate(['required', 'string', 'min:10', 'max:3000'])]
+    #[Validate(['required', 'string', 'min:80', 'max:3000'])]
     public string $inputText = '';
 
     public ?int $auditId = null;
@@ -74,6 +74,13 @@ new class extends Component
      * Annotated text with <mark> spans injected right-to-left.
      * mb_str_split + array_splice — the only UTF-8-safe offset approach.
      * e() applied to attribute values only, never to raw text.
+     *
+     * Each mark carries:
+     *   data-type     — human-readable confusion type label
+     *   data-question — forum_question_template with {excerpt} interpolated
+     *
+     * The template's click handler reads these to render the inline tooltip.
+     * No title attribute — browser native tooltips are unstyled and inconsistent.
      */
     #[Computed]
     public function annotatedText(): string
@@ -85,6 +92,7 @@ new class extends Component
         }
 
         $findings = Finding::where('audit_id', $audit->id)
+            ->with(['findingHeuristics.heuristic'])
             ->orderByDesc('start_char')
             ->get();
 
@@ -104,13 +112,18 @@ new class extends Component
 
             $cssClass = $this->highlightClass($finding->primary_confusion_type);
 
+            // Resolve the Socratic question from the primary heuristic.
+            // Interpolate {excerpt} with the actual matched text.
+            $question    = $this->resolveQuestion($finding);
+            $typeLabel   = $finding->primary_confusion_type->label();
+
             array_splice($chars, $end, 0, ['</mark>']);
             array_splice($chars, $start, 0, [
                 '<mark'
                 . ' class="finding-mark ' . $cssClass . '"'
                 . ' data-finding-id="' . $finding->id . '"'
-                . ' data-confusion-type="' . e($finding->primary_confusion_type->value) . '"'
-                . ' title="' . e($finding->primary_confusion_type->label()) . '"'
+                . ' data-type="' . e($typeLabel) . '"'
+                . ' data-question="' . e($question) . '"'
                 . '>',
             ]);
         }
@@ -128,8 +141,6 @@ new class extends Component
     public function analyze(): void
     {
         $key = 'demo:' . request()->ip();
-
-        // dd($key);
 
         if (RateLimiter::tooManyAttempts($key, maxAttempts: 10)) {
             $this->addError('inputText', 'Too many requests. Please wait a moment before trying again.');
@@ -174,6 +185,24 @@ new class extends Component
 
     // ── Private helpers ───────────────────────────────────────────────────
 
+    private function resolveQuestion(\App\Models\Finding $finding): string
+    {
+        $heuristic = $finding->findingHeuristics
+            ->sortByDesc(fn ($fh) => $fh->heuristic?->severity_weight ?? 0)
+            ->first()
+            ?->heuristic;
+
+        if (! $heuristic || ! $heuristic->forum_question_template) {
+            return 'What specific, observable cases does this concept include?';
+        }
+
+        return str_replace(
+            '{excerpt}',
+            $finding->excerpt,
+            $heuristic->forum_question_template
+        );
+    }
+
     private function highlightClass(ConfusionType $type): string
     {
         return match ($type) {
@@ -193,10 +222,10 @@ new class extends Component
 {{-- ════════════════════════════════════════════════════════════════════════ --}}
 @if ($this->auditId === null)
 
-    <div class="rounded-xl mt-6 border border-white/6 bg-surface p-6">
+    <div class="rounded-xl border mt-4 border-white/6 bg-surface p-6">
 
         <div class="mb-4">
-            <h2 class="mb-1 text-2xl font-medium tracking-tight text-white">
+            <h2 class="mb-1 text-3xl font-medium tracking-tight text-white">
                 Paste your definition, claim, or brief.
             </h2>
             <p class="text-xs leading-relaxed text-white/50">
@@ -210,12 +239,12 @@ new class extends Component
             <flux:textarea
                 wire:model="inputText"
                 wire:loading.attr="disabled"
-                placeholder="e.g. 'Customer success is the process of ensuring customers achieve their desired outcomes…'"
+                placeholder="e.g. 'The word efficiency is universally understood by everyone in all contexts. Obviously this naturally leads to good outcomes in all cases. It is clearly the correct and genuine approach to achieving results effectively and efficiently.'"
                 rows="9"
                 class="font-sans text-sm"
                 autocomplete="off"
+                resize="none"
                 spellcheck="false"
-                @keydown.enter.exact.prevent="$el.closest('form').dispatchEvent(new Event('submit'))"
             />
 
             {{-- Word count + limit --}}
@@ -225,7 +254,7 @@ new class extends Component
                         ? str_word_count($inputText) . ' words'
                         : '' }}
                 </span>
-                <span>max 600 words</span>
+                <span>Max 600 words</span>
             </div>
 
             @error('inputText')
@@ -239,7 +268,7 @@ new class extends Component
                 class="mt-4 w-full"
                 wire:loading.attr="disabled"
             >
-                <span wire:loading.remove>Run the Audit</span>
+                <span wire:loading.remove>Run the Audit →</span>
                 <span wire:loading>Analysing…</span>
             </flux:button>
 
@@ -258,7 +287,7 @@ new class extends Component
 
     @php $audit = $this->audit; @endphp
 
-    <div class="rounded-xl border border-white/6 bg-surface p-6">
+    <div class="rounded-xl mt-4 border border-white/6 bg-surface p-6">
 
         {{-- Header --}}
         <div class="mb-4 flex items-center justify-between border-b border-white/6 pb-4">
@@ -288,12 +317,13 @@ new class extends Component
         <div class="mb-4 flex flex-wrap gap-1.5" role="list">
             @foreach (\App\Enums\ConfusionType::cases() as $type)
                 <flux:badge
-                    class="highlight-{{ $type->highlightGroup() }}"
+                    class="highlight-{{ $type->highlightGroup() }} text-[10px]"
+                    style="background-color: {{ $type->colour()}}/E6"
                     role="listitem"
                 >
                     <span
                         class="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                        style="background-color: {{ $type->colour() }}"
+                        style="background-color: {{ $type->colour()}}"
                         aria-hidden="true"
                     ></span>
                     {{ $type->label() }}
@@ -301,11 +331,25 @@ new class extends Component
             @endforeach
         </div>
 
-        {{-- Annotated text — flux:tooltip wraps each mark on hover --}}
-        {{-- The marks themselves are PHP-injected; tooltip is driven by title attr --}}
-        <div
-            class="mb-4 cursor-default rounded-lg border border-white/6 bg-card px-5 py-4 text-sm leading-loose text-white"
-        >{!! $this->annotatedText !!}</div>
+        {{-- Annotated text + inline tooltip --}}
+        <div class="relative">
+            <div
+                id="annotated-text"
+                class="mb-4 cursor-default rounded-lg border border-white/6 bg-card px-5 py-4 text-sm leading-loose text-white"
+            >{!! $this->annotatedText !!}</div>
+
+            {{-- Tooltip — positioned absolutely, shown on mark click --}}
+            <div
+                id="finding-tooltip"
+                class="absolute z-50 hidden max-w-xs rounded-lg border border-white/6 bg-surface p-3 shadow-lg"
+            >
+                <p id="tooltip-type" class="mb-1 text-[11px] font-medium text-accent"></p>
+                <p id="tooltip-question" class="text-[12px] leading-relaxed text-white/70"></p>
+                <p class="mt-2 text-[11px] text-white/30">
+                    Register to explore the repair →
+                </p>
+            </div>
+        </div>
 
         {{-- Breakdown by confusion type — reads computed property, zero queries --}}
         @if (count($this->breakdownByType) > 0)
@@ -313,9 +357,10 @@ new class extends Component
                 @foreach (\App\Enums\ConfusionType::cases() as $type)
                     @if (($this->breakdownByType[$type->value] ?? 0) > 0)
                         <flux:badge
-                            class="highlight-{{ $type->highlightGroup() }} gap-1.5"
+                            class="highlight-{{ $type->highlightGroup() }} text-[10px] gap-1.5"
+                            style="background-color: {{ $type->colour()}}"
                         >
-                            <span class="text-sm font-medium">
+                            <span class="font-normal">
                                 {{ $this->breakdownByType[$type->value] }}
                             </span>
                             {{ $type->label() }}
@@ -340,3 +385,36 @@ new class extends Component
     </div>
 
 @endif
+
+@pushOnce('scripts')
+<script>
+document.addEventListener('click', function (e) {
+    const mark    = e.target.closest('[data-finding-id]');
+    const tooltip = document.getElementById('finding-tooltip');
+
+    if (! tooltip) return;
+
+    if (! mark) {
+        tooltip.classList.add('hidden');
+        return;
+    }
+
+    document.getElementById('tooltip-type').textContent
+        = mark.dataset.type ?? '';
+    document.getElementById('tooltip-question').textContent
+        = mark.dataset.question ?? '';
+
+    const markRect      = mark.getBoundingClientRect();
+    const containerRect = tooltip.parentElement.getBoundingClientRect();
+    const top           = markRect.bottom - containerRect.top + 6;
+    const left          = Math.min(
+        markRect.left - containerRect.left,
+        containerRect.width - 280
+    );
+
+    tooltip.style.top  = top + 'px';
+    tooltip.style.left = Math.max(0, left) + 'px';
+    tooltip.classList.remove('hidden');
+});
+</script>
+@endPushOnce

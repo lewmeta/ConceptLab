@@ -42,9 +42,9 @@ class LogicAuditor
     // ── Public entry point ────────────────────────────────────────────────
 
     /**
-     * Run the full audit pipeline on a Draft audit
-     * Returns the refreshed Audit in Diagnosed status.
-     * 
+     * Run the full audit pipeline on a Draft audit.
+     * Returns the audit refreshed in Diagnosed status.
+     *
      * @throws \LogicException if the audit is not in Draft status
      */
     public function run(Audit $audit): Audit
@@ -76,11 +76,11 @@ class LogicAuditor
 
     /**
      * Load live heuristics on first use.
-     * Lazy so tests can seed after the singleton is registered.
+     * Lazy so tests can seed after the singleton is registered
+     * in AppServiceProvider without seeing an empty collection.
      */
     private function heuristics(): Collection
     {
-
         if ($this->heuristics === null) {
             $this->heuristics = Heuristic::live()
                 ->orderBy('rule_number')
@@ -92,7 +92,7 @@ class LogicAuditor
 
     /**
      * Flush the cached heuristic collection.
-     * Called in tests after seeding to force a fresh load.
+     * Called in tests after seeding to force a fresh DB load.
      */
     public function flushCache(): void
     {
@@ -102,9 +102,9 @@ class LogicAuditor
     // ── Detection ─────────────────────────────────────────────────────────
 
     /**
-     * Run every live heuristics against the text.
-     * Returns a flat collection of raw match arrays - no DB writes yet.
-     * 
+     * Run every live heuristic against the text.
+     * Returns a flat Collection of raw match arrays — no DB writes yet.
+     *
      * Each match:
      * [
      *   'start_char'      => int,
@@ -120,7 +120,7 @@ class LogicAuditor
         $matches = collect();
 
         foreach ($this->heuristics() as $heuristic) {
-            $logic = $heuristic->trigger_logic; // cast to array by the model
+            $logic = $heuristic->trigger_logic;
 
             foreach ($logic['keywords'] ?? [] as $keyword) {
                 foreach ($this->findAllOccurrences($text, $keyword) as [$start, $end]) {
@@ -136,14 +136,13 @@ class LogicAuditor
 
             foreach ($logic['acting_abstracts'] ?? [] as $abstract) {
                 foreach ($this->findAllOccurrences($text, $abstract) as [$start, $end]) {
-                    $extended = $this->extendToSentenceEnd($text, $end);
-                    $matches->push($this->matchArray($text, $start, $extended, $heuristic));
+                    $matches->push($this->matchArray($text, $start, $end, $heuristic));
                 }
             }
         }
 
         return $matches->filter(
-            fn($m) => $m['end_char'] > $m['start_char']
+            fn ($m) => $m['end_char'] > $m['start_char']
                 && mb_strlen(trim($m['excerpt'])) > 0
         );
     }
@@ -165,8 +164,13 @@ class LogicAuditor
     /**
      * Merge raw matches into consolidated Finding spans.
      *
-     * Spans within 10 chars of each other are merged.
-     * Multiple heuristics on the same region become one Finding
+     * Only genuinely overlapping spans are merged — spans that share at
+     * least one character. The proximity window has been removed because
+     * a gap-based merge causes consecutive sentence-spanning matches
+     * (e.g. acting_abstracts firing across adjacent sentences) to chain
+     * into a single span covering the entire paragraph.
+     *
+     * Multiple heuristics firing on the same region become one Finding
      * with multiple FindingHeuristic pivot rows.
      *
      * Returns array of:
@@ -196,7 +200,9 @@ class LogicAuditor
                 continue;
             }
 
-            if ($match['start_char'] <= $current['end_char'] + 10) {
+            // Only merge when the new span starts inside the current span —
+            // true overlap, not mere proximity.
+            if ($match['start_char'] < $current['end_char']) {
                 $current['end_char']     = max($current['end_char'], $match['end_char']);
                 $current['heuristics'][] = $match;
             } else {
@@ -270,7 +276,6 @@ class LogicAuditor
         }
     }
 
-
     // ── Scoring ───────────────────────────────────────────────────────────
 
     /**
@@ -299,22 +304,29 @@ class LogicAuditor
     // ── Text scanning helpers ─────────────────────────────────────────────
 
     /**
-     * Find all case-insensitive occurrences of a keyword.
+     * Find all word-boundary-aware occurrences of a keyword.
      * Returns [[start, end], ...] as mb char offsets.
-     * Extends each match 60 chars forward for reading context.
+     *
+     * Spans cover the keyword exactly — no context window extension.
+     * The highlight marks the specific word. The tooltip explains it.
+     *
+     * Uses \b word boundaries to prevent substring hits —
+     * e.g. 'all' inside 'universally', 'calls', 'fall'.
      */
     private function findAllOccurrences(string $text, string $keyword): array
     {
         $positions = [];
-        $lower     = mb_strtolower($text);
-        $lowerKey  = mb_strtolower($keyword);
-        $keyLen    = mb_strlen($lowerKey);
-        $textLen   = mb_strlen($text);
-        $offset    = 0;
+        $escaped   = preg_quote($keyword, '/');
+        $pattern   = '/\b' . $escaped . '\b/iu';
 
-        while (($pos = mb_strpos($lower, $lowerKey, $offset)) !== false) {
-            $positions[] = [$pos, min($textLen, $pos + $keyLen + 60)];
-            $offset      = $pos + $keyLen;
+        if (preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE) === false) {
+            return [];
+        }
+
+        foreach ($matches[0] as [$matchText, $byteOffset]) {
+            $start       = mb_strlen(substr($text, 0, $byteOffset));
+            $end         = $start + mb_strlen($matchText);
+            $positions[] = [$start, $end];
         }
 
         return $positions;
@@ -346,7 +358,7 @@ class LogicAuditor
 
             foreach ($matches[0] as [$matchText, $byteOffset]) {
                 $start       = mb_strlen(substr($text, 0, $byteOffset));
-                $end         = min($textLen, $start + mb_strlen($matchText) + 40);
+                $end         = $start + mb_strlen($matchText);
                 $positions[] = [$start, $end];
             }
         } catch (\Throwable) {
@@ -354,22 +366,5 @@ class LogicAuditor
         }
 
         return $positions;
-    }
-
-    /**
-     * Extend an offset to the end of the current sentence.
-     * Looks ahead up to 120 chars for . ! ? — falls back to the limit.
-     */
-    private function extendToSentenceEnd(string $text, int $from): int
-    {
-        $textLen = mb_strlen($text);
-        $maxLook = min($textLen, $from + 120);
-        $slice   = mb_substr($text, $from, $maxLook - $from);
-
-        if (preg_match('/[.!?]\s/u', $slice, $m, PREG_OFFSET_CAPTURE)) {
-            return $from + mb_strlen(substr($slice, 0, $m[0][1])) + 2;
-        }
-
-        return $maxLook;
     }
 }

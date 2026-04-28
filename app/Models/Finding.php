@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['audit_id', 'start_char', 'end_char', 'excerpt', 'primary_confusion_type', 'severity', 'status', 'repair_text', 'repair_requested_at', 'repair_generated_at', 'dismissed_at', 'dismissed_reason',])]
 class Finding extends Model
@@ -108,12 +110,20 @@ class Finding extends Model
     }
 
     /** All pivot rows recording which heuristics fired on this finding's span. */
-    // TODO: Add a FindingHeuristic model for this pivot table to encapsulate heuristic-specific data like weight at the finding level.
+    public function findingHeuristics(): HasMany
+    {
+        return $this->hasMany(FindingHeuristic::class);
+    }
 
     /**
      * All heuristics that fired on this finding (via pivot).
      * Use findingHeuristics() when you need trigger_score or triggered_by_ai.
      */
-    // TODO
+    public function heuristics(): BelongsToMany
+    {
+        return $this->belongsToMany(Heuristic::class, 'finding_heuristics')
+            ->withPivot(['triggered_by_ai', 'trigger_score', 'trigger_excerpt'])
+            ->withTimestamps();
+    }
 
 }
