@@ -34,8 +34,7 @@ class HeuristicSeeder extends Seeder
 
         // Re-enable constraints before inserting new data
         Schema::enableForeignKeyConstraints();
-
-
+        
         $publishedAt = Carbon::now();
 
         $rules = [
@@ -51,7 +50,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Stuck at the word, not the meaning',
                 'trigger_logic'  => [
                     'keywords'                    => ['the word', 'the term', 'by which we mean', 'the label'],
-                    'vague_patterns'              => ['what (the )?word \\w+ means', 'the term \\w+ (is|refers)'],
+                    'vague_patterns'              => ['what (the )?word \\w+ means'],
                     'requires_behavioral_anchor'  => true,
                 ],
                 'repair_template'         => 'Formulate one sentence: "By X we mean … in terms of observable or thinkable cases." Move from the label to a reference description.',
@@ -212,7 +211,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Abstract concept given the properties of a physical object',
                 'trigger_logic'  => [
                     'acting_abstracts' => ['intelligence', 'freedom', 'justice', 'culture', 'society', 'the market', 'the system', 'progress', 'the mind'],
-                    'vague_patterns'   => ['\\w+ (has|contains|holds|carries|stores|moves)', '(the )?\\w+ (itself|as such) (is|does|wants|seeks)'],
+                    'vague_patterns'   => [],
                 ],
                 'repair_template'         => 'Reformulate X as a process or relationship rather than an object. Replace "X has Y" with "when condition Z occurs, outcome Y follows."',
                 'forum_question_template' => 'You wrote "{excerpt}" as if it is a physical thing. What process or relationship is actually happening here?',
@@ -267,7 +266,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'A naming convention presented as an empirical truth',
                 'trigger_logic'  => [
                     'keywords'       => ['it is a fact', 'research shows', 'studies confirm', 'evidence proves'],
-                    'vague_patterns' => ['it (is|has been) (proven|shown|demonstrated) that \\w+ (is|means)', 'by definition it (is|must be|follows)'],
+                    'vague_patterns' => [],
                 ],
                 'repair_template'         => 'Label each sentence as stipulative (a convention) or empirical (a testable claim). Keep them in separate lists.',
                 'forum_question_template' => 'Is "{excerpt}" a definitional choice or an empirical finding? What would it take to prove it wrong?',
@@ -285,7 +284,7 @@ class HeuristicSeeder extends Seeder
                 'trigger_logic'  => [
                     'keywords'       => [],
                     'circular_probe' => true,
-                    'vague_patterns' => ['because of \\w+.{0,40}therefore \\w+.{0,40}because', '\\w+ (leads to|causes) \\w+.{0,60}\\w+ (leads to|causes) \\w+'],
+                    'vague_patterns' => [],
                 ],
                 'repair_template'         => 'Separate what explains from what is explained. Produce a clear schema: cause → effect, with no mutual dependence.',
                 'forum_question_template' => 'Your explanation of "{excerpt}" seems to loop back on itself. What is the independent cause and what is the dependent effect?',
@@ -354,7 +353,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Theory mixes variables from different levels of analysis',
                 'trigger_logic'  => [
                     'keywords'       => ['individuals', 'groups', 'organizations', 'society', 'nations'],
-                    'vague_patterns' => ['(individual|personal) \\w+ (and|affects?|drives?) (social|collective|systemic)', '(society|culture|the system) (makes?|causes?|forces?) (individuals?|people)'],
+                    'vague_patterns' => [],
                 ],
                 'repair_template'         => 'Map each variable to its correct level of analysis. Build a consistent model where all variables operate at the same level.',
                 'forum_question_template' => 'Your theory mixes individual and systemic variables around "{excerpt}." Which level is the theory actually about?',
@@ -388,7 +387,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Theory transplanted between disciplines without validation',
                 'trigger_logic'  => [
                     'keywords'       => ['borrowed from', 'as in physics', 'like in economics', 'the same principle'],
-                    'vague_patterns' => ['the same (principle|logic|law|rule) (applies?|holds?) (in|for)', 'borrowing (from|the concept of) \\w+ (from|in)'],
+                    'vague_patterns' => ['the same (principle|logic|law|rule) (applies?|holds?) (in|for)'],
                 ],
                 'repair_template'         => 'Test the assumptions of the theory per domain. Produce a list of which assumptions are valid and which are not in the new domain.',
                 'forum_question_template' => 'You applied "{excerpt}" from one discipline to another. Which assumptions break down in the new domain?',
@@ -405,7 +404,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Theory collapses into a single way of measuring it',
                 'trigger_logic'  => [
                     'keywords'       => ['operationalized as', 'defined operationally', 'measured exclusively by'],
-                    'vague_patterns' => ['(the theory|\\w+) is (operationalized|defined|measured) (as|by|through)', 'we (define|measure|operationalize) \\w+ (as|using|with) (the|a|our)'],
+                    'vague_patterns' => ['(the theory|operationalization) is (operationalized|defined|measured) (as|by|through)'],
                 ],
                 'repair_template'         => 'Write at least two alternative operationalizations for the construct. If only one is possible, the theory has been reduced to its measurement.',
                 'forum_question_template' => 'You operationalized "{excerpt}" in one specific way. How would the theory change if you measured it differently?',
@@ -422,7 +421,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Theoretical model treated as physical reality',
                 'trigger_logic'  => [
                     'acting_abstracts' => ['the model', 'the framework', 'the theory', 'the construct', 'the structure', 'the system'],
-                    'vague_patterns'   => ['the (model|framework|theory|construct) (shows?|proves?|demonstrates?|reveals?)', 'according to (the model|the framework|the theory) \\w+ (is|does|causes?)'],
+                    'vague_patterns'   => ['the (model|framework|theory|construct) (shows?|proves?|demonstrates?|reveals?)'],
                 ],
                 'repair_template'         => 'Label each model component explicitly as an abstraction. Add the phrase "the model assumes" or "the model predicts" before each claim.',
                 'forum_question_template' => 'You wrote "{excerpt}" as if the model is reality. What would the real-world equivalent of this claim look like?',
@@ -439,7 +438,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Value premises hidden inside scientific-sounding claims',
                 'trigger_logic'  => [
                     'keywords'       => ['should', 'ought', 'must', 'need to', 'it is important', 'it is necessary'],
-                    'vague_patterns' => ['(research|evidence|data) (shows?|suggests?|confirms?) (that )?\\w+ should', 'it (is|has been) (shown|proven|established) that \\w+ (must|should|ought)'],
+                    'vague_patterns' => ['(research|evidence|data) (shows?|suggests?|confirms?) that (it|this|the evidence) should'],
                 ],
                 'repair_template'         => 'Identify every value premise in the argument. Produce an explicit value framework separate from the empirical claims.',
                 'forum_question_template' => 'Your claim about "{excerpt}" sounds empirical but contains a value judgment. What is the underlying normative premise?',
@@ -477,7 +476,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'A measurement proxy treated as the actual construct',
                 'trigger_logic'  => [
                     'keywords'       => ['measured by', 'indicated by', 'captured by', 'assessed through'],
-                    'vague_patterns' => ['\\w+ (is|equals?|equals) (the score|the test|the measurement|the index)', '(the score|the result|the measurement) (of|on|from) \\w+ (is|equals?) \\w+'],
+                    'vague_patterns' => [],
                 ],
                 'repair_template'         => 'Define the construct independently of any measurement. Produce a construct description that could exist without the indicator.',
                 'forum_question_template' => 'You treated "{excerpt}" as if the measurement and the concept are the same. What aspects of the concept does the measurement miss?',
@@ -529,7 +528,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Measurement misses relevant cases (false negatives)',
                 'trigger_logic'  => [
                     'keywords'       => ['only counts', 'only measures', 'restricted to', 'limited to measuring'],
-                    'vague_patterns' => ['only (measures?|counts?|captures?) \\w+ (when|if|that)', 'does not (capture|measure|include) (cases?|instances?) (where|when|in which)'],
+                    'vague_patterns' => [],
                 ],
                 'repair_template'         => 'Perform a sensitivity analysis. List the false negatives the indicator misses and expand the criteria to include them.',
                 'forum_question_template' => 'What relevant cases of "{excerpt}" would your measure fail to detect? What false negatives does it produce?',
@@ -631,7 +630,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Estimate or approximation treated as a certain fact',
                 'trigger_logic'  => [
                     'keywords'       => ['the score is', 'the result is', 'the measurement shows', 'proves'],
-                    'vague_patterns' => ['the (score|result|measurement|test|data) (proves?|shows?|confirms?) (that|this)', '\\w+ (scored?|achieved?|obtained?) \\d+ (which|so|therefore)'],
+                    'vague_patterns' => ['the (score|result|measurement|test|data) (proves?|shows?|confirms?) (that|this)'],
                 ],
                 'repair_template'         => 'Reformulate the score as an estimate. Add a confidence interval and acknowledge the measurement error.',
                 'forum_question_template' => 'You stated "{excerpt}" as a certainty. What is the measurement error or confidence interval around this score?',
@@ -648,7 +647,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'Measurement instrument contains hidden value judgments',
                 'trigger_logic'  => [
                     'keywords'       => ['desirable', 'appropriate', 'correct answer', 'ideal score', 'expected response'],
-                    'vague_patterns' => ['(the|a) (desirable|appropriate|correct|ideal|expected) (score|answer|response|level)', 'measures (how well|how much|the degree to which) \\w+ (should|ought|is expected)'],
+                    'vague_patterns' => ['(the|a) (desirable|appropriate|correct|ideal|expected) (score|answer|response|level)'],
                 ],
                 'repair_template'         => 'Conduct a bias audit on the measurement instrument. Produce a bias report identifying where value judgments are embedded in the scoring.',
                 'forum_question_template' => 'Does your measurement of "{excerpt}" assume a particular response is better or more correct? Where is the normative judgment in the instrument?',
@@ -704,7 +703,7 @@ class HeuristicSeeder extends Seeder
                 'trigger_logic'  => [
                     'keywords'       => [],
                     'circular_probe' => true,
-                    'vague_patterns' => ['these (cases|examples|instances) are (\\w+ )?because they (are|fit|match)', '\\w+ (are|qualify) (as|because) they (are|represent|exemplify) \\w+'],
+                    'vague_patterns' => [],
                 ],
                 'repair_template'         => 'Add external criteria for selecting the examples that are independent of the concept being defined. Run an independent test.',
                 'forum_question_template' => 'How did you select the examples of "{excerpt}"? Were they chosen because they fit the definition — which was built from those examples?',
@@ -913,7 +912,7 @@ class HeuristicSeeder extends Seeder
                 'plain_name'     => 'A norm justified only by reference to itself',
                 'trigger_logic'  => [
                     'keywords'       => ['because it is right', 'because that is how it should be', 'by its very nature'],
-                    'vague_patterns' => ['(should|ought|must) \\w+.{0,40}because (it is|that is) (right|correct|proper|how it)', '(it is|this is) (right|proper|correct) (because|since|as) (it is|that is)'],
+                    'vague_patterns' => [],
                     'circular_probe' => true,
                 ],
                 'repair_template'         => 'Provide an external justification for the norm that does not reference the norm itself. Produce a structured argument.',

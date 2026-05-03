@@ -254,7 +254,7 @@ new class extends Component
                         ? str_word_count($inputText) . ' words'
                         : '' }}
                 </span>
-                <span>Max 600 words</span>
+                <span>Max 3000 words</span>
             </div>
 
             @error('inputText')
