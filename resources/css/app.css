@@ -142,13 +142,3 @@ textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
-
-.fastest_donation_checkout {
-    background: radial-gradient(42.62% 100.46% at 70.87% 100.03%, #0d38bb 0, rgba(156, 38, 80, 0) 100%), #001145;
-    background-color: #001145;
-    padding-top: 116px;
-    color: #FFFFFF;
-    overflow: hidden;
-    position: relative;
-    padding-bottom: 80px;
-}
