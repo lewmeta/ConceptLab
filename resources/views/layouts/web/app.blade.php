@@ -12,7 +12,7 @@
 
     <!-- Body Layout -->
     <div id="content"
-        class="z-10! max-lg:pl-0! flex h-full flex-1 flex-col lg:min-h-100avh pl-64 transition-[padding] duration-150">
+        class="z-10! max-lg:pl-0! flex h-full flex-1 flex-col lg:min-h-dvh pl-64 transition-[padding] duration-150">
         <!-- Header -->
         @include('layouts.web.header')
 

@@ -1,7 +1,7 @@
 <!-- Large -->
-<div aria-expanded="true"
+<div :aria-expanded="show"
     class="hidden lg:block fixed h-full left-0 z-41! cursor-e-resize aria-expanded:cursor-default transition-[width] duration-150 backdrop-blur-md border-r text-[#0f0f10] group/sidebar bg-gray-50"
-    :class="{ 'w-[16rem]': show, 'w-15.25': !show }" x-data="{ show: true }" @colapse-toggle.window="show = false;"
+    :class="{ 'w-[16rem]': show, 'w-15.25': !show }" x-data="{ show: true }" @collapse-toggle.window="show = false;"
     @open-toggle.window="show = true;">
     <div id="sidebar-portal-root"></div>
     <div class="relative flex flex-col w-full h-full pb-0 overflow-hidden scroll-smooth max-h-screen">
@@ -46,8 +46,7 @@
                                 </div>
 
                                 <div x-show="show"
-                                    class="flex items-center justify-between flex-1 transition-all duration-150 group-aria-expanded/sidebar:opacity-100 opacity-0 translate-x-1 group-aria-expanded/sidebar:translate-x-0 h-9"
-                                    x-show="show">
+                                    class="flex items-center justify-between flex-1 transition-all duration-150 group-aria-expanded/sidebar:opacity-100 opacity-0 translate-x-1 group-aria-expanded/sidebar:translate-x-0 h-9">
                                     <p
                                         class="text-[13px] font-normal whitespace-nowrap max-w-42 truncate text-gray-900">
                                         Lewis' workspace is coming along good.

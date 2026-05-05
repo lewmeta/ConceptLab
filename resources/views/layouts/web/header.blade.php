@@ -73,7 +73,7 @@
                         style="opacity: 1; transform: scale(0.65);">
                         <img alt="Lewis Meta" loading="lazy" width="40" height="40" decoding="async"
                             data-nimg="1" class="rounded-full shrink-0 bg-gray-50 object-cover h-full w-full"
-                            src="{{ asset('profile/profile.webp') }}" width="60" height="40"
+                            src="{{ asset('profile/profile.webp') }}"
                             style="color: transparent;">
                     </div>
                 </div>
@@ -120,7 +120,7 @@
         <!-- Page title -->
         <div class="hstack gap-1.5 items-center whitespace-nowrap min-w-0 overflow-hidden w-full py-1 px-1 -mr-1">
             <div class="shrink-0">
-                <a data-agent-id="link-_r_1o0_" class="flex focus-ring outline-none rounded-md" href="/app/files">
+                <a data-agent-id="link-_r_1o0_" class="flex focus-ring outline-none rounded-md" href="{{ route('files.index') }}">
                     <p data-testid="page-title"
                         class="text-sm text-[#0f0f10] font-medium truncate hover:text-gray-950">
                         Files
@@ -232,7 +232,7 @@
                         <div class="-mx-1 my-1 h-px bg-neutral-200"></div>
                         <div class="relative group">
                             <div
-                                class="relative flex cursor-default select-none hover:bg-neutral-100 items-center rounded px-2 py-1.5 text-sm outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50">
+                                class="relative flex cursor-default select-none hover:bg-neutral-100 items-center rounded px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round" class="mr-2 w-4 h-4">
