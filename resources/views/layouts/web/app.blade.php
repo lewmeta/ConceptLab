@@ -18,7 +18,7 @@
 
         <!-- Body content -->
         <div
-            class="stack min-h-[calc(100%-7.9px)] pt-12.5 box-border max-[1023px]:pt-[3.12rem] max-[1023px]:pb-0 lg:transition-[padding_200ms_cubic-bezier(0.42,0,0.58,1)] lg:w-full lg:mx-auto lg:pb-0 px-5">
+            class="stack min-h-[calc(100%-.9px)] pt-12.5 box-border max-[1023px]:pt-[3.12rem] max-[1023px]:pb-0 lg:transition-[padding_200ms_cubic-bezier(0.42,0,0.58,1)] lg:w-full lg:mx-auto lg:pb-0 px-5">
             <div class="relative w-full max-h-22 min-h-5 overflow-hidden">
                 <div class="relative w-full pb-0 xl:pb-[calc(50%-576px)]">
                 </div>

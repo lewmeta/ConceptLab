@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\EnsureWorkspaceMember;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => EnsureAdmin::class,
             'workspace.member' => EnsureWorkspaceMember::class,
+            'onboarded' => EnsureOnboardingIsComplete::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
