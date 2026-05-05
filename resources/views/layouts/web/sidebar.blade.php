@@ -257,6 +257,8 @@
                 </div>
             </div>
         </nav>
+
+         <x-desktop-user-menu />
     </div>
 </div>
 
@@ -273,7 +275,7 @@
             <div class="flex grow flex-col overflow-y-auto bg-white overflow-x-hidden">
                 <!-- Logo --->
                 <div class="flex justify-between pr-3.5 items-center w-full shrink-0 h-12.5">
-                    <div class="flex flex-row justify-between items-center px-3 w-full relative z-20">
+                    {{-- <div class="flex flex-row justify-between items-center px-3 w-full relative z-20">
                         <div class="flex justify-between relative group/header-logo items-center h-12.5 w-full">
                             <div class="flex opacity-100 transition-opacity duration-100">
                                 <div class="flex items-center translate-x-3.25 transition-transform duration-150">
@@ -367,6 +369,12 @@
                                 </div>
                             </div>
                         </div>
+                    </div> --}}
+
+                    <div class="flex items-center gap-1 px-3">
+                        <img src="{{ asset('favicon.svg') }}" class="size-6 object-contain " alt="">
+                        <h1 class="font-waldenburg font-bold text-[18.5px]"> {{ __('ConceptLabs') }}
+                        </h1>
                     </div>
 
                     <!-- Toggle button -->
