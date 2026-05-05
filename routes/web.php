@@ -22,6 +22,9 @@ Route::prefix('auth/{provider}')
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });
+// Route::middleware('web')->group(function () {
+//     Route::view('app', 'layouts.web.app')->name('app');
+// });
 
 // ── Authenticated — Workspace required ───────────────────────────────────────
 
