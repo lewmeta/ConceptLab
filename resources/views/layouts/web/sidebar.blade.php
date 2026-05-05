@@ -1,7 +1,7 @@
 <!-- Large -->
-<div :aria-expanded="show"
+<div aria-expanded="true"
     class="hidden lg:block fixed h-full left-0 z-41! cursor-e-resize aria-expanded:cursor-default transition-[width] duration-150 backdrop-blur-md border-r text-[#0f0f10] group/sidebar bg-gray-50"
-    :class="{ 'w-[16rem]': show, 'w-15.25': !show }" x-data="{ show: true }" @collapse-toggle.window="show = false;"
+    :class="{ 'w-[16rem]': show, 'w-15.25': !show }" x-data="{ show: true }" @colapse-toggle.window="show = false;"
     @open-toggle.window="show = true;">
     <div id="sidebar-portal-root"></div>
     <div class="relative flex flex-col w-full h-full pb-0 overflow-hidden scroll-smooth max-h-screen">
@@ -45,8 +45,8 @@
                                     </div>
                                 </div>
 
-                                <div x-show="show"
-                                    class="flex items-center justify-between flex-1 transition-all duration-150 group-aria-expanded/sidebar:opacity-100 opacity-0 translate-x-1 group-aria-expanded/sidebar:translate-x-0 h-9">
+                                <div class="flex items-center justify-between flex-1 transition-all duration-150 group-aria-expanded/sidebar:opacity-100 opacity-0 translate-x-1 group-aria-expanded/sidebar:translate-x-0 h-9"
+                                    x-show="show">
                                     <p
                                         class="text-[13px] font-normal whitespace-nowrap max-w-42 truncate text-gray-900">
                                         Lewis' workspace is coming along good.
@@ -154,30 +154,6 @@
 
                                 </ul>
                             </li>
-
-
-                            {{-- <flux:navbar.item icon="layout-grid" :href="route('dashboard')"
-                                :current="request()->routeIs('dashboard')" wire:navigate x-show="show"
-                                class="[&>div>svg]:size-4 w-full! font-light!">
-                                {{ __('Dashboard') }}
-                            </flux:navbar.item>
-
-                            <flux:navbar.item class="[&>div>svg]:size-4 w-full" icon="magnifying-glass"
-                                href="#" x-show="show">
-                                {{ __('Search') }}
-                            </flux:navbar.item>
-
-                            <flux:tooltip :content="__('Search')" position="right" x-show="!show">
-                                <flux:navbar.item class="[&>div>svg]:size-4" icon="magnifying-glass" href="#">
-                                </flux:navbar.item>
-                            </flux:tooltip>
-
-                            <flux:tooltip :content="__('Dashboard')" position="right" x-show="!show">
-                                <flux:navbar.item icon="layout-grid" :href="route('dashboard')"
-                                    :current="request()->routeIs('dashboard')" wire:navigate
-                                    class="[&>div>svg]:size-4">
-                                </flux:navbar.item>
-                            </flux:tooltip> --}}
                         </ul>
                     </div>
                 </div>

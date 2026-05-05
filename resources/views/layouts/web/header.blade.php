@@ -120,7 +120,7 @@
         <!-- Page title -->
         <div class="hstack gap-1.5 items-center whitespace-nowrap min-w-0 overflow-hidden w-full py-1 px-1 -mr-1">
             <div class="shrink-0">
-                <a data-agent-id="link-_r_1o0_" class="flex focus-ring outline-none rounded-md" href="{{ route('files.index') }}">
+                <a data-agent-id="link-_r_1o0_" class="flex focus-ring outline-none rounded-md" href="#">
                     <p data-testid="page-title"
                         class="text-sm text-[#0f0f10] font-medium truncate hover:text-gray-950">
                         Files
