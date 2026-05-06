@@ -11,7 +11,18 @@ use Override;
 class LoginResponse implements LoginResponseContract
 {
     /**
-     * Handle the response after login.
+     * Resolve the redirect target after a successful login.
+     *
+     * Flow:
+     *   1. Onboarding not completed → /onboarding
+     *      (edge case: OAuth user who somehow skipped onboarding)
+     *   2. Most recent diagnosed audit exists → /audits/{id}
+     *      (returning user lands directly in their work)
+     *   3. No diagnosed audit → /dashboard
+     *      (returning user with no prior audits)
+     *
+     * Note: Audit query is scoped by WorkspaceScope to current_workspace_id
+     * automatically — no explicit workspace filter needed here.
      */
     #[Override]
     public function toResponse($request)
