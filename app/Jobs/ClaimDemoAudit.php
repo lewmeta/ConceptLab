@@ -78,6 +78,10 @@ class ClaimDemoAudit implements ShouldQueue
                 'is_demo'      => false,
             ]);
         });
+
+        Log::info('ClaimDemoAudit: Audit has been claimed.', [
+            'demo_session_key' => $this->demoSessionKey,
+        ]);
     }
 
 

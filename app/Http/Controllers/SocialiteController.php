@@ -80,7 +80,9 @@ class SocialiteController extends Controller
 
         Auth::login($user, remember: true);
 
-        return redirect()->intended('/dashboard');
+        return app(\App\Http\Responses\LoginResponse::class)->toResponse(request());
+
+        // return redirect()->intended('/dashboard');
     }
 
     private function abortIfUnsupported(string $provider): void

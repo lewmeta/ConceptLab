@@ -20,24 +20,9 @@ Route::prefix('auth/{provider}')
     });
 
 
-Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
-    Route::get('/onboarding', function () {
-        $user = Auth::user();
+Route::middleware(['auth', 'verified'])->group(function () {
 
-        // If onboarding is already complete, send them to their workspace.
-        // Prevents revisiting the overlay on back-navigation.
-        if ($user->hasCompletedOnboarding) {
-            return redirect()->route('dashboard');
-        }
-
-        // If somehow the user has no workspace yet (edge case: OAuth race),
-        // Send them to the dashboard which will trigger workspace creation.
-        if (! $user->current_workspace_id) {
-            return redirect()->route('dashboard');
-        }
-
-        return view('pages.onboarding.index');
-    })->name('onboarding');
+    Route::livewire('/onboarding', 'onboarding')->name('onboarding');
 });
 
 // ── Authenticated — Workspace required ───────────────────────────────────────
@@ -49,8 +34,11 @@ Route::middleware(['auth', 'workspace.member', 'onboarded'])->group(function () 
 
     // Stub route — replaced with a full Livewire controller in Module 3.
     // Registered now so FortifyServiceProvider post-auth redirects resolve.
+    // Later changes to a livewire route.✓
     Route::get('/audits/{audit}', function (\App\Models\Audit $audit) {
-        return view('dashboard');
+        return view('pages.audit.show', [
+            'audit' => $audit,
+        ]);
     })->name('audits.show');
 });
 

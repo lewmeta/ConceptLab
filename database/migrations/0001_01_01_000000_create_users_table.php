@@ -36,7 +36,7 @@ return new class extends Migration
             $table->unsignedBigInteger('current_workspace_id')->nullable();
 
             // NULL = onboarding sequence not yet completed
-            $table->timestamp('onboaring_completed_at')->nullable();
+            $table->timestamp('onboarding_completed_at')->nullable();
 
 
             $table->rememberToken();

@@ -3,7 +3,7 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
+    <body class="min-h-screen bg-white antialiased font-waldenburg dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
         <div class="w-full min-h-svh h-full">
             {{ $slot }}
         </div>
