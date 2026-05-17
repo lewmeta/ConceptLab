@@ -34,7 +34,15 @@ class LoginResponse implements LoginResponseContract
             return redirect()->route('onboarding');
         }
 
-        $latestAudit = Audit::where('status', AuditStatus::Diagnosed)->latest()->first();
+        // $latestAudit = Audit::where('status', AuditStatus::Diagnosed)
+        //     ->where()
+        //     ->latest()->first();
+
+        // Scoped to the user's workspace
+        $latestAudit = \App\Models\Audit::where('workspace_id', $user->current_workspace_id)
+            ->where('status', \App\Enums\AuditStatus::Diagnosed)
+            ->latest()
+            ->first();
 
         return redirect()->intended(
             $latestAudit ? route('audits.show', $latestAudit) : route('dashboard')

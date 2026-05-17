@@ -68,7 +68,7 @@ class ProvisionWorkspace
         if (filled($demoSessionKey)) {
             // Dispatch demo claim after the transaction commits.
             ClaimDemoAudit::dispatch($user->id, $demoSessionKey);
-            Log::debug("ProvisionWorkspace: Dispatching demo claim job.", ['demo_session_key' => $demoSessionKey]);
+            Log::debug("ProvisionWorkspace: Dispatched demo claim job.", ['demo_session_key' => $demoSessionKey]);
         }
     }
 }
