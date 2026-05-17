@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 
+/* ── Google Fonts ────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Sans:wght@400;500;600&display=swap');
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
@@ -9,11 +12,51 @@
 /* Dark mode variant */
 @custom-variant dark (&:where(.dark, .dark *));
 
+
+
 /* ── Design tokens ───────────────────────────────────────────────────────── */
 @theme {
+
+    /* Typography */
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-waldenburg: "Waldenburg", sans-serif;
+    --font-serif: 'Fraunces', Georgia, serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
+    /* ── Jasper marketing palette ────────────────────────────────────────── */
+    --color-cream: #F5F1EB;
+    --color-cream-dark: #EDE9E1;
+    --color-cream-border: #E2DDD5;
+
+    /* Navy — primary text & dark surface */
+    --color-navy: #00063D;
+
+    /* Coral — CTA accent */
+    --color-coral: #FA4028;
+    --color-coral-hover: #E03520;
+    --color-coral-light: #FFE8E2;
+
+    /* Supporting palette */
+    --color-yellow: #FFD24A;
+    --color-yellow-light: #FFFCE8;
+    --color-salmon: #FF8B6E;
+    --color-forest: #1F4D2B;
+    --color-forest-light: #EAF3EB;
+
+    /* ── Dashboard dark palette (app shell — not marketing) ──────────────── */
+    --color-base: #0C0C0A;
+    --color-surface: #111110;
+    --color-card: #1A1A17;
+
+    /* ── Confusion-type colours — locked per SBA spec ────────────────────── */
+    --color-word-concept: #534AB7;
+    --color-concept-referent: #0F6E56;
+    --color-concept-theory: #BA7517;
+    --color-concept-operationalization: #185FA5;
+    --color-prototype-essence: #993C1D;
+    --color-feature-indicator: #993556;
+
+    /* ── Zinc scale — Flux UI compatibility ──────────────────────────────── */
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
     --color-zinc-200: #e5e5e5;
@@ -34,18 +77,6 @@
     --color-base: #0C0C0A;
     --color-surface: #111110;
     --color-card: #1A1A17;
-
-    /* Accent */
-    /* --color-accent: #6C62C7; */
-    --color-accent-hover: #7B72D6;
-
-    /* Confusion type colours — locked per UI spec */
-    --color-word-concept: #534AB7;
-    --color-concept-referent: #0F6E56;
-    --color-concept-theory: #BA7517;
-    --color-concept-operationalization: #185FA5;
-    --color-prototype-essence: #993C1D;
-    --color-feature-indicator: #993556;
 }
 
 @font-face {
@@ -56,10 +87,11 @@
 }
 
 @font-face {
-  font-family: 'Waldenburg';
-  src: url('../fonts/waldenburg-bold.woff2') format('woff2');
-  font-weight: 700; /* or bold */
-  font-style: normal;
+    font-family: 'Waldenburg';
+    src: url('../fonts/waldenburg-bold.woff2') format('woff2');
+    font-weight: 700;
+    /* or bold */
+    font-style: normal;
 }
 
 :root {
@@ -103,6 +135,30 @@
 
 @layer components {
 
+    /* ── Jasper collage textures ─────────────────────────────────────────── */
+    .bg-graph-paper-pink {
+        background-color: #FFF0F4;
+        background-image:
+            linear-gradient(#FFD2DD 1px, transparent 1px),
+            linear-gradient(90deg, #FFD2DD 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+
+    .bg-halftone-navy {
+        background-image: radial-gradient(var(--color-navy) 1px, transparent 1px);
+        background-size: 16px 16px;
+    }
+
+    .bg-halftone-white {
+        background-image: radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+        background-size: 16px 16px;
+    }
+
+    /* ── Brand hexagon clip ──────────────────────────────────────────────── */
+    .clip-hex {
+        clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    }
+
     /* Brand hexagon — clip-path cannot be expressed as a utility */
     .brand-hex {
         clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
@@ -111,37 +167,90 @@
     /* Finding highlight marks — background + border-bottom pair per type */
     .finding-mark {
         border-radius: 3px;
-        padding: 1px 2px;
+        padding: 1px 3px;
         border-bottom-width: 2px;
         border-bottom-style: solid;
         cursor: pointer;
-        transition: filter 150ms;
+        transition: filter 150ms ease;
     }
 
     .finding-mark:hover {
-        filter: brightness(1.3);
+        filter: brightness(1.25);
     }
 
+    /* terminological: word_concept + concept_referent */
     .highlight-red {
+        background: rgba(220, 60, 60, 0.15);
+        border-bottom-color: rgba(220, 60, 60, 0.55);
+    }
+
+    /* .highlight-red {
         background: var(--hl-red-bg);
         border-bottom-color: var(--hl-red-border);
+    } */
+
+    /* measurement: concept_operationalization */
+    .highlight-amber {
+        background: rgba(186, 117, 23, 0.15);
+        border-bottom-color: rgba(186, 117, 23, 0.55);
     }
 
-    .highlight-amber {
+    /* .highlight-amber {
         background: var(--hl-amber-bg);
         border-bottom-color: var(--hl-amber-border);
+    } */
+
+    /* structural: concept_theory + prototype_essence */
+    .highlight-purple {
+        background: rgba(83, 74, 183, 0.15);
+        border-bottom-color: rgba(83, 74, 183, 0.55);
     }
 
-    .highlight-purple {
+    /* .highlight-purple {
         background: var(--hl-purple-bg);
         border-bottom-color: var(--hl-purple-border);
+    } */
+
+    /* normative: feature_indicator */
+    .highlight-pink {
+        background: rgba(153, 53, 86, 0.15);
+        border-bottom-color: rgba(153, 53, 86, 0.55);
     }
 
-    .highlight-pink {
+    /* .highlight-pink {
         background: var(--hl-pink-bg);
         border-bottom-color: var(--hl-pink-border);
+    } */
+
+
+    /* ── Jasper offset block shadows ─────────────────────────────────────── */
+    /*
+       Cannot be expressed cleanly without repeating arbitrary values.
+       Named per colour so callers are explicit about intent.
+    */
+    .shadow-offset-coral {
+        box-shadow: 16px 16px 0 0 var(--color-coral);
     }
+
+    .shadow-offset-salmon {
+        box-shadow: 16px 16px 0 0 var(--color-salmon);
+    }
+
+    .shadow-offset-sm-coral {
+        box-shadow: 8px 8px 0 0 var(--color-coral);
+    }
+
+    .shadow-offset-sm-forest {
+        box-shadow: 8px 8px 0 0 var(--color-forest-light);
+    }
+
+    .shadow-offset-sm-navy {
+        box-shadow: 8px 8px 0 0 rgba(0, 6, 61, 0.06);
+    }
+
 }
+
+
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
