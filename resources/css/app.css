@@ -1,8 +1,8 @@
-@import 'tailwindcss';
-@import '../../vendor/livewire/flux/dist/flux.css';
-
 /* ── Google Fonts ────────────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Sans:wght@400;500;600&display=swap');
+
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -11,8 +11,6 @@
 
 /* Dark mode variant */
 @custom-variant dark (&:where(.dark, .dark *));
-
-
 
 /* ── Design tokens ───────────────────────────────────────────────────────── */
 @theme {
